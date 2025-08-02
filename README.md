@@ -1,2 +1,2 @@
-# -event-feed-auto
+# event-feed-auto
 events
