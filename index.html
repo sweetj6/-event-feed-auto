@@ -77,8 +77,12 @@
       let soonest = null;
       events.forEach(event => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${event.date}</td><td>${event.time}</td><td>${event.title}</td>`;
-        tbody.appendChild(tr);
+const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric'
+});
+tr.innerHTML = `<td>${formattedDate}</td><td>${event.time}</td><td>${event.title}</td>`;        tbody.appendChild(tr);
 
         const d = new Date(event.date);
         if (!soonest || d < soonest) soonest = d;
