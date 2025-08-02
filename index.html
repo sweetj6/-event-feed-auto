@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Event Countdown</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    #countdown {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upcoming Events</h1>
+  <table id="eventsTable">
+    <thead>
+      <tr><th>Date</th><th>Time</th><th>Title</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="countdown">Loading countdown...</div>
+
+  <script>
+    async function fetchEvents() {
+      const res = await fetch('data/events.json');
+      const events = await res.json();
+
+      const tbody = document.querySelector('#eventsTable tbody');
+      tbody.innerHTML = '';
+
+      let soonest = null;
+      events.forEach(event => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${event.date}</td><td>${event.time}</td><td>${event.title}</td>`;
+        tbody.appendChild(tr);
+
+        const d = new Date(event.date);
+        if (!soonest || d < soonest) soonest = d;
+      });
+
+      // Countdown logic
+      if (soonest) {
+        const today = new Date();
+        const diff = Math.ceil((soonest - today) / (1000 * 60 * 60 * 24));
+        document.getElementById('countdown').textContent = 
+          `Next event in ${diff} day${diff !== 1 ? 's' : ''}: ${soonest.toDateString()}`;
+      } else {
+        document.getElementById('countdown').textContent = "No upcoming events";
+      }
+    }
+
+    fetchEvents();
+  </script>
+</body>
+</html>
