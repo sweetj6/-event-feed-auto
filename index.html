@@ -67,41 +67,46 @@
 
   <div id="countdown">Loading countdown...</div>
 
-  <script>
-    async function fetchEvents() {
-      const res = await fetch('data/events.json');
-      const events = await res.json();
+<script>
+  async function fetchEvents() {
+    const res = await fetch('data/events.json');
+    const events = await res.json();
 
-      const tbody = document.querySelector('#eventsTable tbody');
-      tbody.innerHTML = '';
+    const tbody = document.querySelector('#eventsTable tbody');
+    tbody.innerHTML = '';
 
-      let soonest = null;
-      events.forEach(event => {
-        const tr = document.createElement('tr');
-const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric'
-});
-tr.innerHTML = `<td>${formattedDate}</td><td>${event.time}</td><td>${event.title}</td>`;        tbody.appendChild(tr);
+    let soonest = null;
 
-        const d = new Date(event.date);
-        if (!soonest || d < soonest) soonest = d;
+    events.forEach(event => {
+      const rawDate = new Date(event.date + "T00:00:00"); // force valid ISO string
+      const formattedDate = rawDate.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
       });
 
-      if (soonest) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        soonest.setHours(0, 0, 0, 0);
-        const diff = Math.ceil((soonest - today) / (1000 * 60 * 60 * 24));
-        document.getElementById('countdown').textContent =
-          `Next event in ${diff} day${diff !== 1 ? 's' : ''}: ${soonest.toDateString()}`;
-      } else {
-        document.getElementById('countdown').textContent = "No upcoming events";
-      }
-    }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${formattedDate}</td><td>${event.time}</td><td>${event.title}</td>`;
+      tbody.appendChild(tr);
 
-    fetchEvents();
-  </script>
+      if (!soonest || rawDate < soonest) soonest = rawDate;
+    });
+
+    if (soonest) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      soonest.setHours(0, 0, 0, 0);
+
+      const diff = Math.ceil((soonest - today) / (1000 * 60 * 60 * 24));
+      document.getElementById('countdown').textContent =
+        `Next event in ${diff} day${diff !== 1 ? 's' : ''}: ${soonest.toDateString()}`;
+    } else {
+      document.getElementById('countdown').textContent = "No upcoming events";
+    }
+  }
+
+  fetchEvents();
+</script>
+
 </body>
 </html>
